@@ -71,7 +71,7 @@ Curso: Ciência da Computação
 
 Disciplina: Estrutura de Dados
 
-Professor: Prof. MSc Eng Heleno Cardoso
+Professor: Prof.  Heleno Cardoso
 
 Tema: Estruturas de Dados aplicadas a situações reais
 
