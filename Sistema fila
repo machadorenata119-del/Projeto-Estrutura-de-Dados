@@ -1,0 +1,96 @@
+from collections import deque
+from datetime import datetime
+
+# Sistema demonstrativo de atendimento com três estruturas de dados:
+# 1) Fila (deque): atende por ordem de chegada (FIFO).
+# 2) Lista: mantém o histórico dos atendimentos concluídos.
+# 3) Pilha: registra os últimos atendimentos para permitir desfazer
+#    a conclusão mais recente (LIFO).
+
+fila_atendimento = deque()
+historico = []
+pilha_desfazer = []
+
+def cadastrar_cliente():
+    nome = input("Nome do cliente: ").strip()
+    if not nome:
+        print("Nome inválido.")
+        return
+    senha = len(fila_atendimento) + len(historico) + 1
+    registro = {
+        "senha": senha,
+        "nome": nome,
+        "entrada": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    }
+    fila_atendimento.append(registro)
+    print(f"Cliente {nome} entrou na fila. Senha: {senha}")
+
+def mostrar_fila():
+    if not fila_atendimento:
+        print("Não há clientes aguardando.")
+        return
+    print("\n--- Fila atual (ordem de atendimento) ---")
+    for posicao, cliente in enumerate(fila_atendimento, start=1):
+        print(f"{posicao}. Senha {cliente['senha']} - {cliente['nome']}")
+
+def chamar_proximo():
+    if not fila_atendimento:
+        print("Fila vazia.")
+        return
+    cliente = fila_atendimento.popleft()
+    cliente["saida"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    historico.append(cliente)
+    pilha_desfazer.append(cliente)
+    print(f"Chamando senha {cliente['senha']}: {cliente['nome']}")
+
+def exibir_historico():
+    if not historico:
+        print("Ainda não existem atendimentos concluídos.")
+        return
+    print("\n--- Histórico de atendimentos ---")
+    for cliente in historico:
+        print(f"Senha {cliente['senha']} - {cliente['nome']} | Concluído: {cliente['saida']}")
+
+def desfazer_ultimo():
+    if not pilha_desfazer:
+        print("Não há atendimento para desfazer.")
+        return
+    cliente = pilha_desfazer.pop()
+    # Remove do histórico e retorna o cliente ao início da fila,
+    # pois ele era o atendimento mais recentemente concluído.
+    if cliente in historico:
+        historico.remove(cliente)
+    cliente.pop("saida", None)
+    fila_atendimento.appendleft(cliente)
+    print(f"Atendimento da senha {cliente['senha']} foi desfeito e voltou ao início da fila.")
+
+def menu():
+    while True:
+        print("""
+====== SISTEMA DE FILA DE ATENDIMENTO ======
+1 - Cadastrar cliente
+2 - Mostrar fila
+3 - Chamar próximo cliente
+4 - Exibir histórico
+5 - Desfazer último atendimento
+0 - Sair
+""")
+        opcao = input("Escolha uma opção: ").strip()
+        if opcao == "1":
+            cadastrar_cliente()
+        elif opcao == "2":
+            mostrar_fila()
+        elif opcao == "3":
+            chamar_proximo()
+        elif opcao == "4":
+            exibir_historico()
+        elif opcao == "5":
+            desfazer_ultimo()
+        elif opcao == "0":
+            print("Sistema encerrado.")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
+if __name__ == "__main__":
+    menu()
